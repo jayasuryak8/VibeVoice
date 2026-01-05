@@ -1,0 +1,50 @@
+# simple_vibevoice_tts.py
+import torch
+from vibevoice import VibeVoiceModel, VibeVoiceTokenizer
+
+# -----------------------------
+# 1) Load model and tokenizer
+# -----------------------------
+model_name = "VibeVoice-1.5B"  # Or "VibeVoice-Realtime-0.5B"
+device = "cuda" if torch.cuda.is_available() else "cpu"
+
+print(f"Loading VibeVoice model: {model_name} on {device}...")
+model = VibeVoiceModel.from_pretrained(model_name).to(device)
+tokenizer = VibeVoiceTokenizer.from_pretrained(model_name)
+
+# -----------------------------
+# 2) Encode input text
+# -----------------------------
+text = """
+Speaker0: Hello! Welcome to testing VibeVoice.
+Speaker1: This is a demo of multi-speaker TTS.
+"""
+print("Tokenizing text...")
+input_tokens = tokenizer.encode(text)
+
+# -----------------------------
+# 3) Run inference (generate speech)
+# -----------------------------
+print("Generating audio tokens...")
+with torch.no_grad():
+    # Depending on model API, generation call may vary:
+    audio_output = model.generate(
+        input_tokens,
+        max_length=2000,
+        temperature=0.7,
+    )
+
+# -----------------------------
+# 4) Decode to waveform
+# -----------------------------
+print("Decoding to audio waveform...")
+wav = model.decode_audio(audio_output)
+
+# -----------------------------
+# 5) Save to WAV file
+# -----------------------------
+output_path = "vibevoice_demo.wav"
+print(f"Saving output audio to {output_path}...")
+wav.save(output_path, sample_rate=48000)
+
+print("Done!")
