@@ -1,4 +1,4 @@
-# simple_vibevoice_tts.py
+
 import torch
 from vibevoice import VibeVoiceModel, VibeVoiceTokenizer
 
